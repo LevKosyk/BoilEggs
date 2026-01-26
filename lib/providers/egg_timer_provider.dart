@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:boil_eggs/services/notification_service.dart'; // Import NotificationService
 
 enum EggDoneness {
   soft(label: 'Soft', minutes: 6, description: 'Runny yolk, firm white'),
@@ -55,9 +56,35 @@ class EggTimerProvider with ChangeNotifier {
       } else {
         _timer?.cancel();
         _status = TimerStatus.done;
+        NotificationService().showNotification(
+          id: 0,
+          title: 'Egg Ready!',
+          body: 'Your egg is boiled to perfection.',
+        );
         notifyListeners();
       }
     });
+  }
+
+  void upgradeDoneness(EggDoneness newDoneness) {
+    if (_selectedDoneness == null) return;
+    if (newDoneness.minutes <= _selectedDoneness!.minutes) return;
+
+    final diffMinutes = newDoneness.minutes - _selectedDoneness!.minutes;
+    _remainingSeconds += diffMinutes * 60;
+    _selectedDoneness = newDoneness;
+    
+    // Resume timer if it was done or just update if running
+    if (_status == TimerStatus.done || _status == TimerStatus.idle) {
+        startTimer();
+    } 
+    // If paused, we just extended time, user can resume manually or auto? 
+    // Let's auto-resume for better UX "Go Harder" -> Starts boiling.
+    else if (_status == TimerStatus.paused) {
+        startTimer();
+    }
+    
+    notifyListeners();
   }
 
   void pauseTimer() {

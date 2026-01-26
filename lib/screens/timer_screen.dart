@@ -2,10 +2,12 @@ import 'package:boil_eggs/providers/egg_timer_provider.dart';
 import 'package:boil_eggs/screens/finish_screen.dart'; // We'll create this next
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:boil_eggs/widgets/boiling_animation.dart';
-import 'package:boil_eggs/widgets/circular_timer.dart';
+import 'package:boil_eggs/widgets/egg_illustration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+
+import 'package:boil_eggs/l10n/app_localizations.dart';
 
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
@@ -28,6 +30,7 @@ class _TimerScreenState extends State<TimerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: Consumer<EggTimerProvider>(
         builder: (context, provider, child) {
@@ -43,6 +46,15 @@ class _TimerScreenState extends State<TimerScreen> {
           final minutes = (provider.remainingSeconds / 60).floor();
           final seconds = provider.remainingSeconds % 60;
           final timeText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+          
+          String titleStr = t.defaultTitle;
+          if (provider.selectedDoneness != null) {
+             titleStr = switch (provider.selectedDoneness!) {
+                EggDoneness.soft => t.soft,
+                EggDoneness.medium => t.medium,
+                EggDoneness.hard => t.hard,
+             };
+          }
 
           return Stack(
             children: [
@@ -69,7 +81,7 @@ class _TimerScreenState extends State<TimerScreen> {
                           ),
                           const Spacer(),
                           Text(
-                            provider.selectedDoneness?.label ?? "Boil Eggs",
+                            titleStr,
                             style: Theme.of(context).textTheme.titleLarge?.copyWith(
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -82,11 +94,91 @@ class _TimerScreenState extends State<TimerScreen> {
                     
                     const Spacer(),
 
-                    // Timer Circular Indicator
-                    CircularTimer(
-                      progress: provider.progress,
-                      timeText: timeText,
+                    // Timer & Egg Visual
+                    Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        // Background Circle
+                        SizedBox(
+                          width: 250,
+                          height: 250,
+                          child: CircularProgressIndicator(
+                            value: 1.0,
+                            strokeWidth: 20,
+                            color: AppColors.softEgg.withValues(alpha: 0.2),
+                          ),
+                        ),
+                        // Progress Circle
+                        SizedBox(
+                          width: 250,
+                          height: 250,
+                          child: CircularProgressIndicator(
+                            value: provider.progress,
+                            strokeWidth: 20,
+                            strokeCap: StrokeCap.round,
+                            color: AppColors.primaryAccent,
+                          ),
+                        ),
+                        // The Egg
+                        const EggIllustration(height: 140)
+                            .animate(
+                              target: provider.status == TimerStatus.boiling ? 1 : 0,
+                              onPlay: (controller) => controller.repeat(reverse: true),
+                            )
+                            .moveY(begin: 0, end: -10, duration: 1000.ms, curve: Curves.easeInOut) // Bobbing effect
+                            .shake(hz: 0.5, rotation: 0.05), // Slight wobble
+                      ],
                     ).animate().scale(curve: Curves.easeOutBack, duration: 500.ms),
+
+                    const SizedBox(height: 40),
+                    
+                    // Time Text
+                    Column(
+                      children: [
+                        Text(
+                          timeText,
+                          style: Theme.of(context).textTheme.displayLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                fontFeatures: [const FontFeature.tabularFigures()],
+                                color: AppColors.textPrimary,
+                              ),
+                        ),
+                        Text(
+                           titleStr,
+                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w500,
+                              ),
+                        ),
+                      ],
+                    ),
+                    
+                    const SizedBox(height: 24),
+
+                    // Upgrade Button
+                    if (provider.selectedDoneness != null && provider.selectedDoneness != EggDoneness.hard)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (provider.selectedDoneness == EggDoneness.soft) {
+                                provider.upgradeDoneness(EggDoneness.medium);
+                              } else if (provider.selectedDoneness == EggDoneness.medium) {
+                                provider.upgradeDoneness(EggDoneness.hard);
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.secondaryAccent,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            ),
+                            child: Text(
+                              provider.selectedDoneness == EggDoneness.soft 
+                                  ? t.upgradeToMedium 
+                                  : t.upgradeToHard,
+                            ),
+                          ).animate().fadeIn().slideY(begin: 0.2, end: 0),
+                        ),
 
                     const Spacer(),
 
@@ -99,14 +191,14 @@ class _TimerScreenState extends State<TimerScreen> {
                           if (provider.status == TimerStatus.boiling)
                             _ControlButton(
                               icon: Icons.pause_rounded,
-                              label: "Pause",
+                              label: t.pause,
                               color: AppColors.primaryAccent,
                               onTap: provider.pauseTimer,
                             )
                           else if (provider.status == TimerStatus.paused || provider.status == TimerStatus.idle)
                              _ControlButton(
                               icon: Icons.play_arrow_rounded,
-                              label: "Resume",
+                              label: t.resume,
                               color: AppColors.secondaryAccent,
                               onTap: provider.startTimer,
                             ),
@@ -115,7 +207,7 @@ class _TimerScreenState extends State<TimerScreen> {
                           
                           _ControlButton(
                             icon: Icons.stop_rounded,
-                            label: "Cancel",
+                            label: t.cancel,
                             color: AppColors.hardEgg,
                             onTap: () {
                               provider.cancelTimer();

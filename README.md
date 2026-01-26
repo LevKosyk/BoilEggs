@@ -1,16 +1,43 @@
-# boil_eggs
+# Boil Eggs App
 
-A new Flutter project.
+A beautiful and simple Flutter application to help you boil eggs perfectly.
+
+## Features
+- **Customizable Doneness**: Choose between Soft, Medium, and Hard boiled eggs.
+- **Timer & Animations**: Visual timer with smooth animations.
+- **Language Support**: English and Spanish support.
+- **Local Notifications**: Get notified when your egg is ready.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- [Flutter SDK](https://flutter.dev/docs/get-started/install) installed.
+- iOS Simulator or Android Emulator.
 
-A few resources to get you started if this is your first Flutter project:
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd BoilEggs
+   ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3. Generate localization files:
+   ```bash
+   flutter gen-l10n
+   ```
+
+4. Run the app:
+   ```bash
+   flutter run
+   ```
+
+## Development
+- **Code Generation**: If you change `.arb` files, run `flutter gen-l10n` to update translations.
+- **Icon Generation**: To update app icons, configure `flutter_launcher_icons.yaml` (if added) and run generation command.
+
+Enjoy your perfect eggs!

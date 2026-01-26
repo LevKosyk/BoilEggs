@@ -3,6 +3,8 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import 'package:boil_eggs/l10n/app_localizations.dart';
+
 class FinishScreen extends StatefulWidget {
   const FinishScreen({super.key});
 
@@ -28,6 +30,7 @@ class _FinishScreenState extends State<FinishScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: Stack(
         children: [
@@ -61,7 +64,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   const SizedBox(height: 32),
                   
                   Text(
-                    "Success!",
+                    t.successTitle,
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
@@ -69,7 +72,7 @@ class _FinishScreenState extends State<FinishScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    "Your eggs are ready to eat.\nEnjoy your meal!",
+                    t.successBody,
                     textAlign: TextAlign.center,
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           color: AppColors.textSecondary,
@@ -85,7 +88,7 @@ class _FinishScreenState extends State<FinishScreen> {
                         // Pop back to home (TimerScreen was pushed replaced, so popping this goes to home)
                         Navigator.of(context).pop(); 
                       },
-                      child: const Text("Boil More"),
+                      child: Text(t.boilMore),
                     ),
                   ).animate().slideY(begin: 1, end: 0, delay: 500.ms, curve: Curves.easeOutQuart),
                 ],

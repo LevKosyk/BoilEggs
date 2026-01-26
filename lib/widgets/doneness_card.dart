@@ -1,6 +1,7 @@
 import 'package:boil_eggs/providers/egg_timer_provider.dart';
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:boil_eggs/l10n/app_localizations.dart';
 
 class DonenessCard extends StatelessWidget {
   final EggDoneness doneness;
@@ -16,18 +17,27 @@ class DonenessCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context)!;
     final color = switch (doneness) {
       EggDoneness.soft => AppColors.softEgg,
       EggDoneness.medium => AppColors.mediumEgg,
       EggDoneness.hard => AppColors.hardEgg,
     };
 
+    final label = switch (doneness) {
+      EggDoneness.soft => t.soft,
+      EggDoneness.medium => t.medium,
+      EggDoneness.hard => t.hard,
+    };
+
+    final scale = isSelected ? 1.05 : 1.0;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOutBack,
-        transform: Matrix4.identity()..scale(isSelected ? 1.05 : 1.0),
+        transform: Matrix4.diagonal3Values(scale, scale, 1.0),
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
         decoration: BoxDecoration(
@@ -62,19 +72,19 @@ class DonenessCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    doneness.label,
+                    label,
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: AppColors.textPrimary,
                         ),
                   ),
                   const SizedBox(height: 4),
-                  Text(
-                    doneness.description,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: AppColors.textSecondary,
-                        ),
-                  ),
+                  // Text(
+                  //   doneness.description, // TODO: Localize description
+                  //   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  //         color: AppColors.textSecondary,
+                  //       ),
+                  // ),
                 ],
               ),
             ),

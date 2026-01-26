@@ -1,11 +1,17 @@
 import 'package:boil_eggs/providers/egg_timer_provider.dart';
+import 'package:boil_eggs/providers/locale_provider.dart'; // Import LocaleProvider
+import 'package:boil_eggs/services/notification_service.dart'; // Import NotificationService
 import 'package:boil_eggs/screens/home_screen.dart';
 import 'package:boil_eggs/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart'; // Import flutter_localizations
+import 'package:boil_eggs/l10n/app_localizations.dart'; // Import AppLocalizations
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -23,12 +29,28 @@ class BoilEggsApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => EggTimerProvider()),
+        ChangeNotifierProvider(create: (_) => LocaleProvider()), // Add LocaleProvider
       ],
-      child: MaterialApp(
-        title: 'Boil Eggs',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        home: const HomeScreen(),
+      child: Consumer<LocaleProvider>( // Consume LocaleProvider
+        builder: (context, localeProvider, child) {
+          return MaterialApp(
+            title: 'Boil Eggs',
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.lightTheme,
+            locale: localeProvider.locale, // Set locale
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('en'), // English
+              Locale('es'), // Spanish
+            ],
+            home: const HomeScreen(),
+          );
+        },
       ),
     );
   }
