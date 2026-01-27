@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:boil_eggs/services/notification_service.dart';
 import 'package:boil_eggs/services/history_service.dart';
+import 'package:home_widget/home_widget.dart';
 
 enum EggDoneness {
   soft(label: 'Soft', baseMinutes: 6, description: 'Runny yolk, firm white'),
@@ -118,6 +119,34 @@ class EggTimerProvider with ChangeNotifier {
     return total < 60 ? 60 : total;
   }
 
+  Future<void> _syncWidget() async {
+    const groupId = 'group.com.example.boilEggs';
+    
+    // Set the App Group ID for iOS
+    try {
+      await HomeWidget.setAppGroupId(groupId);
+    } catch (e) {
+      debugPrint("Error setting App Group ID: $e");
+    }
+
+    await HomeWidget.saveWidgetData<String>('status', _status.name);
+    await HomeWidget.saveWidgetData<String>('doneness', _selectedDoneness?.label ?? '--');
+    
+    // Calculate end timestamp (millis since epoch) for native countdowns
+    int endTimestamp = 0;
+    if (_status == TimerStatus.boiling) {
+       endTimestamp = DateTime.now().add(Duration(seconds: _remainingSeconds)).millisecondsSinceEpoch;
+    }
+    await HomeWidget.saveWidgetData<int>('end_timestamp', endTimestamp);
+    await HomeWidget.saveWidgetData<int>('total_seconds', _totalSeconds);
+    await HomeWidget.saveWidgetData<int>('remaining_seconds', _remainingSeconds);
+
+    await HomeWidget.updateWidget(
+      name: 'BoilEggsWidget', // Android
+      iOSName: 'BoilEggsWidget', // iOS
+    );
+  }
+
   void startTimer() {
     if (_status == TimerStatus.boiling) return;
     
@@ -136,6 +165,7 @@ class EggTimerProvider with ChangeNotifier {
     }
     
     _status = TimerStatus.boiling;
+    _syncWidget(); // Update widget state
     notifyListeners();
 
     // Calculate target completion time
@@ -166,6 +196,8 @@ class EggTimerProvider with ChangeNotifier {
 
   void _finishTimer() {
     _status = TimerStatus.done;
+    _syncWidget(); // Update widget state to done
+    
     // Notification is handled by schedule, but show one now if app is open just in case
     // Actually scheduling handles it. We can validly show a foreground dialog or just let it be.
     // If we rely on scheduling, we don't need to manually show() if we are in foreground, 
@@ -212,6 +244,7 @@ class EggTimerProvider with ChangeNotifier {
         startTimer();
     }
     
+    _syncWidget(); // Update widget state logic
     notifyListeners();
   }
 
@@ -220,6 +253,7 @@ class EggTimerProvider with ChangeNotifier {
       _timer?.cancel();
       NotificationService().cancel(0); // Cancel scheduled notification
       _status = TimerStatus.paused;
+      _syncWidget(); // Update widget state
       notifyListeners();
     }
   }
@@ -237,6 +271,7 @@ class EggTimerProvider with ChangeNotifier {
   void reset() {
     _status = TimerStatus.idle;
     _recalculateTime();
+    _syncWidget(); // Update widget state
     notifyListeners();
   }
 
@@ -244,6 +279,7 @@ class EggTimerProvider with ChangeNotifier {
     _timer?.cancel();
     NotificationService().cancel(0); // Cancel scheduled notification
     reset(); // Reuse reset logic
+    // Reset handles sync
   }
   
   @override
