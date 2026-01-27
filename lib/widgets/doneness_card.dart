@@ -92,7 +92,7 @@ class DonenessCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${doneness.minutes}',
+                  '${doneness.baseMinutes}',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: color,

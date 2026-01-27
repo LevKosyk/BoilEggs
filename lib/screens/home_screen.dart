@@ -87,6 +87,59 @@ class HomeScreen extends StatelessWidget {
                 child: EggIllustration(height: 220),
               ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack),
               
+              const SizedBox(height: 16),
+              
+              // Customization Panel
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Consumer<EggTimerProvider>(
+                    builder: (context, provider, _) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                             BoxShadow(
+                               color: Colors.black.withValues(alpha: 0.05),
+                               blurRadius: 10,
+                               offset: const Offset(0, 4),
+                             ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            // Size Selector
+                            _CustomizationOption(
+                              label: "Size",
+                              value: provider.selectedSize.label,
+                              icon: Icons.egg_rounded,
+                              onTap: () {
+                                // Rotate through sizes
+                                final nextIndex = (provider.selectedSize.index + 1) % EggSize.values.length;
+                                provider.setSize(EggSize.values[nextIndex]);
+                              },
+                            ),
+                            Container(width: 1, height: 40, color: Colors.grey.withValues(alpha: 0.2)),
+                            // Temp Selector
+                            _CustomizationOption(
+                              label: "Temp",
+                              value: provider.selectedTemp.label,
+                              icon: Icons.thermostat_rounded,
+                              onTap: () {
+                                // Rotate through temps
+                                final nextIndex = (provider.selectedTemp.index + 1) % EggTemp.values.length;
+                                provider.setTemp(EggTemp.values[nextIndex]);
+                              },
+                            ),
+                          ],
+                        ),
+                      ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 200.ms);
+                    }
+                ),
+              ),
+
               const Spacer(),
               
               // Selection Cards
@@ -120,6 +173,57 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CustomizationOption extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _CustomizationOption({
+    required this.label,
+    required this.value,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        child: Column(
+          children: [
+             Row(
+               children: [
+                 Icon(icon, size: 16, color: AppColors.textSecondary),
+                 const SizedBox(width: 4),
+                 Text(
+                   label.toUpperCase(),
+                   style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                     color: AppColors.textSecondary,
+                     fontWeight: FontWeight.bold,
+                     letterSpacing: 1.0,
+                   ),
+                 ),
+               ],
+             ),
+             const SizedBox(height: 4),
+             Text(
+               value,
+               style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                 fontWeight: FontWeight.bold,
+                 color: AppColors.primaryAccent,
+               ),
+             ),
+          ],
         ),
       ),
     );

@@ -47,6 +47,10 @@ class BoilEggsApp extends StatelessWidget {
             supportedLocales: const [
               Locale('en'), // English
               Locale('es'), // Spanish
+              Locale('pl'), // Polish
+              Locale('de'), // German
+              Locale('pt'), // Portuguese
+              Locale('uk'), // Ukrainian
             ],
             home: const HomeScreen(),
           );

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
 import 'package:boil_eggs/widgets/settings_widgets.dart';
+import 'package:boil_eggs/services/history_service.dart';
+import 'package:boil_eggs/theme/app_colors.dart';
 import '../providers/locale_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -45,52 +47,247 @@ class SettingsScreen extends StatelessWidget {
                   SettingsTile(
                     title: t.language,
                     showDivider: false,
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
-                      ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton<String?>(
-                          value: localeProvider.locale?.languageCode, // null for system default
-                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue),
-                          isDense: true,
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          _getLanguageName(localeProvider.locale?.languageCode),
                           style: const TextStyle(
-                            color: Colors.blue,
+                            color: AppColors.primaryAccent,
+                            fontWeight: FontWeight.bold,
                             fontSize: 16,
-                            fontWeight: FontWeight.w500,
                           ),
-                          onChanged: (String? newValue) {
-                             if (newValue == null) {
-                               localeProvider.setLocale(null);
-                             } else {
-                               localeProvider.setLocale(Locale(newValue));
-                             }
-                          },
-                          items: [
-                            DropdownMenuItem(
-                              value: null,
-                              child: Text("System Default"),
-                            ),
-                            const DropdownMenuItem(
-                              value: 'en',
-                              child: Text("English"),
-                            ),
-                            const DropdownMenuItem(
-                              value: 'es',
-                              child: Text("Español"),
-                            ),
-                          ],
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: Colors.grey),
+                      ],
+                    ),
+                    onTap: () => _showLanguageSelector(context, localeProvider),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              // Statistics Section
+              FutureBuilder<List<int>>(
+                future: Future.wait([
+                  HistoryService().getBoilsToday(),
+                  HistoryService().getBoilsThisWeek(),
+                ]),
+                builder: (context, snapshot) {
+                  final today = snapshot.data?[0] ?? 0;
+                  final week = snapshot.data?[1] ?? 0;
+                  
+                  return SettingsSection(
+                    title: "STATISTICS",
+                    children: [
+                       SettingsTile(
+                         title: "Boiled Today",
+                         trailing: Text(
+                           "$today",
+                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                         ),
+                       ),
+                       SettingsTile(
+                         title: "Boiled This Week",
+                         showDivider: false,
+                         trailing: Text(
+                           "$week",
+                           style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                         ),
+                       ),
+                    ],
+                  );
+                }
+              ),
+              const SizedBox(height: 24),
+              // Sound & Haptics Section (Stub)
+              SettingsSection(
+                title: "SOUND & HAPTICS",
+                children: [
+                  SettingsTile(
+                    title: "Sound Effect",
+                    trailing: const Text("Classic", style: TextStyle(color: Colors.grey)),
+                    onTap: () {
+                      // TODO: Implement Sound Selection
+                    },
+                  ),
+                  SettingsTile(
+                    title: "Vibration",
+                    showDivider: false,
+                    trailing: Switch(
+                      value: true, 
+                      onChanged: (val) {
+                         // TODO: Implement Vibration Toggle
+                      },
+                      activeTrackColor: AppColors.primaryAccent,
                     ),
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+  void _showLanguageSelector(BuildContext context, LocaleProvider provider) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 8),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Text(
+                AppLocalizations.of(context)!.selectLanguage,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const Divider(height: 1),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                padding: const EdgeInsets.only(bottom: 24),
+                children: [
+                  _LanguageOption(
+                    label: "System Default",
+                    code: null,
+                    isSelected: provider.locale == null,
+                    onTap: () {
+                      provider.setLocale(null);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "English",
+                    code: 'en',
+                    isSelected: provider.locale?.languageCode == 'en',
+                    onTap: () {
+                      provider.setLocale(const Locale('en'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "Español",
+                    code: 'es',
+                    isSelected: provider.locale?.languageCode == 'es',
+                    onTap: () {
+                      provider.setLocale(const Locale('es'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "Polski",
+                    code: 'pl',
+                    isSelected: provider.locale?.languageCode == 'pl',
+                    onTap: () {
+                      provider.setLocale(const Locale('pl'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "Deutsch",
+                    code: 'de',
+                    isSelected: provider.locale?.languageCode == 'de',
+                    onTap: () {
+                      provider.setLocale(const Locale('de'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "Português",
+                    code: 'pt',
+                    isSelected: provider.locale?.languageCode == 'pt',
+                    onTap: () {
+                      provider.setLocale(const Locale('pt'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                  _LanguageOption(
+                    label: "Українська",
+                    code: 'uk',
+                    isSelected: provider.locale?.languageCode == 'uk',
+                    onTap: () {
+                      provider.setLocale(const Locale('uk'));
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _getLanguageName(String? code) {
+    if (code == null) return "System Default";
+    return switch (code) {
+      'en' => "English",
+      'es' => "Español",
+      'pl' => "Polski",
+      'de' => "Deutsch",
+      'pt' => "Português",
+      'uk' => "Українська",
+      _ => code.toUpperCase(),
+    };
+  }
+}
+
+class _LanguageOption extends StatelessWidget {
+  final String label;
+  final String? code;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageOption({
+    required this.label,
+    required this.code,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primaryAccent.withValues(alpha: 0.1) : Colors.transparent,
+        ),
+        child: Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? AppColors.primaryAccent : AppColors.textPrimary,
+              ),
+            ),
+            const Spacer(),
+            if (isSelected)
+              const Icon(Icons.check_circle_rounded, color: AppColors.primaryAccent),
+          ],
         ),
       ),
     );

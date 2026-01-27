@@ -217,6 +217,41 @@ class _TimerScreenState extends State<TimerScreen> {
                         ],
                       ),
                     ),
+
+                    
+                    // Smart Tip
+                    if (provider.status == TimerStatus.boiling)
+                       Container(
+                         margin: const EdgeInsets.symmetric(horizontal: 24),
+                         padding: const EdgeInsets.all(16),
+                         decoration: BoxDecoration(
+                           color: Colors.white.withValues(alpha: 0.9),
+                           borderRadius: BorderRadius.circular(16),
+                           boxShadow: [
+                             BoxShadow(
+                               color: Colors.black.withValues(alpha: 0.05),
+                               blurRadius: 10,
+                               offset: const Offset(0, 4),
+                             ),
+                           ],
+                         ),
+                         child: Row(
+                           children: [
+                             const Icon(Icons.lightbulb_rounded, color: Colors.orangeAccent),
+                             const SizedBox(width: 12),
+                             Expanded(
+                               child: Text(
+                                 "Tip: ${_getSmartTip()}",
+                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                   color: AppColors.textSecondary,
+                                   fontStyle: FontStyle.italic,
+                                 ),
+                               ),
+                             ),
+                           ],
+                         ),
+                       ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 1000.ms),
+
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -226,6 +261,18 @@ class _TimerScreenState extends State<TimerScreen> {
         },
       ),
     );
+  }
+
+  String _getSmartTip() {
+    const tips = [
+      "Use older eggs for easier peeling.",
+      "Shock eggs in ice water after boiling to stop cooking.",
+      "Add a pinch of salt to the water to prevent cracking.",
+      "Room temperature eggs are less likely to crack.",
+      "Don't overcrowd the pot; eggs should fit in a single layer.",
+    ];
+    // Simple rotation based on current minute or random
+    return tips[DateTime.now().minute % tips.length];
   }
 }
 
