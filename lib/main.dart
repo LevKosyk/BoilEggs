@@ -1,6 +1,7 @@
 import 'package:boil_eggs/providers/egg_timer_provider.dart';
 import 'package:boil_eggs/providers/locale_provider.dart'; // Import LocaleProvider
 import 'package:boil_eggs/services/notification_service.dart'; // Import NotificationService
+import 'package:boil_eggs/services/ad_service.dart'; // Import AdService
 import 'package:boil_eggs/screens/home_screen.dart';
 import 'package:boil_eggs/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -12,6 +13,11 @@ import 'package:boil_eggs/l10n/app_localizations.dart'; // Import AppLocalizatio
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
+  try {
+    await AdService().init();
+  } catch (e) {
+    debugPrint("Failed to initialize AdMob: $e");
+  }
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

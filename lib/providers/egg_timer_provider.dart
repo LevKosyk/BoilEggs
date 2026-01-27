@@ -115,6 +115,19 @@ class EggTimerProvider with ChangeNotifier {
     _status = TimerStatus.boiling;
     notifyListeners();
 
+    // Calculate target completion time
+    final now = DateTime.now();
+    final targetTime = now.add(Duration(seconds: _remainingSeconds));
+    
+    // Schedule background notification
+    NotificationService().scheduleNotification(
+      id: 0,
+      title: 'Egg Ready!',
+      body: 'Your egg is boiled perfectly!',
+      scheduledDate: targetTime,
+    );
+
+    // Run timer for UI updates
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_remainingSeconds > 0) {
         _remainingSeconds--;
@@ -128,11 +141,12 @@ class EggTimerProvider with ChangeNotifier {
 
   void _finishTimer() {
     _status = TimerStatus.done;
-    NotificationService().showNotification(
-      id: 0,
-      title: 'Egg Ready!',
-      body: 'Your egg is boiled perfectly!',
-    );
+    // Notification is handled by schedule, but show one now if app is open just in case
+    // Actually scheduling handles it. We can validly show a foreground dialog or just let it be.
+    // If we rely on scheduling, we don't need to manually show() if we are in foreground, 
+    // BUT flutter_local_notifications handling of foreground varies by settings.
+    // For safety, we can leave the scheduling to fire.
+    
     HistoryService().recordBoil(); // Save only on success
     notifyListeners();
   }
@@ -179,6 +193,7 @@ class EggTimerProvider with ChangeNotifier {
   void pauseTimer() {
     if (_status == TimerStatus.boiling) {
       _timer?.cancel();
+      NotificationService().cancel(0); // Cancel scheduled notification
       _status = TimerStatus.paused;
       notifyListeners();
     }
@@ -186,6 +201,7 @@ class EggTimerProvider with ChangeNotifier {
 
   void cancelTimer() {
     _timer?.cancel();
+    NotificationService().cancel(0); // Cancel scheduled notification
     _status = TimerStatus.idle;
     _recalculateTime(); // Reset to initial calculated time
     notifyListeners();
