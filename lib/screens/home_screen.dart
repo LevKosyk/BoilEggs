@@ -158,9 +158,22 @@ class HomeScreen extends StatelessWidget {
                             builder: (context, provider, child) {
                               return Column(
                                 children: EggDoneness.values.map((doneness) {
+                                  // Calculate dynamic time for this option based on current size/temp
+                                  final durationSeconds = provider.calculateDuration(doneness);
+                                  final minutes = (durationSeconds / 60).floor();
+                                  final seconds = durationSeconds % 60;
+                                  
+                                  String timeStr;
+                                  if (seconds == 0) {
+                                    timeStr = "$minutes";
+                                  } else {
+                                    timeStr = "$minutes:${seconds.toString().padLeft(2, '0')}";
+                                  }
+
                                   return DonenessCard(
                                     doneness: doneness,
                                     isSelected: provider.selectedDoneness == doneness,
+                                    displayTime: timeStr,
                                     onTap: () {
                                       provider.selectDoneness(doneness);
                                       // Navigate to Timer Screen

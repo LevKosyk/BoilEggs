@@ -46,12 +46,14 @@ class _BannerAdWidgetState extends State<BannerAdWidget> {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(
-           top: BorderSide(
-             color: Colors.grey.withValues(alpha: 0.1),
-             width: 1,
-           ),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

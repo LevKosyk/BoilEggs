@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
 import 'package:boil_eggs/widgets/settings_widgets.dart';
 import 'package:boil_eggs/services/history_service.dart';
+import 'package:boil_eggs/providers/egg_timer_provider.dart'; // Add import
 import 'package:boil_eggs/theme/app_colors.dart';
 import '../providers/locale_provider.dart';
 
@@ -11,8 +12,10 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   @override
+  @override
   Widget build(BuildContext context) {
     var localeProvider = Provider.of<LocaleProvider>(context);
+    var timerProvider = Provider.of<EggTimerProvider>(context); // Listen to timer provider
     var t = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -100,25 +103,24 @@ class SettingsScreen extends StatelessWidget {
                 }
               ),
               const SizedBox(height: 24),
-              // Sound & Haptics Section (Stub)
+              // Sound & Haptics Section
               SettingsSection(
                 title: "SOUND & HAPTICS",
                 children: [
                   SettingsTile(
                     title: "Sound Effect",
-                    trailing: const Text("Classic", style: TextStyle(color: Colors.grey)),
-                    onTap: () {
-                      // TODO: Implement Sound Selection
-                    },
+                    trailing: Switch(
+                      value: timerProvider.soundEnabled,
+                      onChanged: (val) => timerProvider.setSound(val),
+                      activeTrackColor: AppColors.primaryAccent,
+                    ),
                   ),
                   SettingsTile(
                     title: "Vibration",
                     showDivider: false,
                     trailing: Switch(
-                      value: true, 
-                      onChanged: (val) {
-                         // TODO: Implement Vibration Toggle
-                      },
+                      value: timerProvider.vibrationEnabled, 
+                      onChanged: (val) => timerProvider.setVibration(val),
                       activeTrackColor: AppColors.primaryAccent,
                     ),
                   ),

@@ -20,9 +20,9 @@ enum EggDoneness {
 }
 
 enum EggSize {
-  small(label: 'Small', adjustmentSeconds: -30),
+  small(label: 'Small', adjustmentSeconds: -45),
   medium(label: 'Medium', adjustmentSeconds: 0),
-  large(label: 'Large', adjustmentSeconds: 30);
+  large(label: 'Large', adjustmentSeconds: 45);
 
   final String label;
   final int adjustmentSeconds;
@@ -53,6 +53,9 @@ class EggTimerProvider with ChangeNotifier {
   EggSize _selectedSize = EggSize.medium;
   EggTemp _selectedTemp = EggTemp.fridge;
   
+  bool _soundEnabled = true;
+  bool _vibrationEnabled = true;
+
   TimerStatus _status = TimerStatus.idle;
   int _remainingSeconds = 0;
   int _totalSeconds = 0; // To track progress accurately
@@ -64,6 +67,8 @@ class EggTimerProvider with ChangeNotifier {
   EggTemp get selectedTemp => _selectedTemp;
   TimerStatus get status => _status;
   int get remainingSeconds => _remainingSeconds;
+  bool get soundEnabled => _soundEnabled;
+  bool get vibrationEnabled => _vibrationEnabled;
   
   double get progress {
     if (_totalSeconds == 0) return 0.0;
@@ -104,12 +109,30 @@ class EggTimerProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Helper to calculate duration for UI preview without selecting
+  int calculateDuration(EggDoneness doneness) {
+    int base = doneness.baseMinutes * 60;
+    int size = _selectedSize.adjustmentSeconds;
+    int temp = _selectedTemp.adjustmentSeconds;
+    int total = base + size + temp;
+    return total < 60 ? 60 : total;
+  }
+
   void startTimer() {
     if (_status == TimerStatus.boiling) return;
     
     // If starting from idle, ensure time is set
     if (_status == TimerStatus.idle && _remainingSeconds == 0) {
         _recalculateTime();
+    }
+    
+    // Guard against 0 or negative seconds to prevent crash
+    if (_remainingSeconds <= 0) {
+      // If still 0, force recalculate or default (though recalculate should handle it)
+      _recalculateTime();
+      if (_remainingSeconds <= 0) {
+         _remainingSeconds = 60; // Fallback safety
+      }
     }
     
     _status = TimerStatus.boiling;
@@ -119,13 +142,15 @@ class EggTimerProvider with ChangeNotifier {
     final now = DateTime.now();
     final targetTime = now.add(Duration(seconds: _remainingSeconds));
     
-    // Schedule background notification
-    NotificationService().scheduleNotification(
-      id: 0,
-      title: 'Egg Ready!',
-      body: 'Your egg is boiled perfectly!',
-      scheduledDate: targetTime,
-    );
+    // Schedule background notification only if sound is enabled
+    if (_soundEnabled) {
+      NotificationService().scheduleNotification(
+        id: 0,
+        title: 'Egg Ready!',
+        body: 'Your egg is boiled perfectly!',
+        scheduledDate: targetTime,
+      );
+    }
 
     // Run timer for UI updates
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -199,12 +224,26 @@ class EggTimerProvider with ChangeNotifier {
     }
   }
 
+  void setSound(bool enabled) {
+    _soundEnabled = enabled;
+    notifyListeners();
+  }
+
+  void setVibration(bool enabled) {
+    _vibrationEnabled = enabled;
+    notifyListeners();
+  }
+
+  void reset() {
+    _status = TimerStatus.idle;
+    _recalculateTime();
+    notifyListeners();
+  }
+
   void cancelTimer() {
     _timer?.cancel();
     NotificationService().cancel(0); // Cancel scheduled notification
-    _status = TimerStatus.idle;
-    _recalculateTime(); // Reset to initial calculated time
-    notifyListeners();
+    reset(); // Reuse reset logic
   }
   
   @override

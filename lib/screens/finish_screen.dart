@@ -1,8 +1,11 @@
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import 'package:boil_eggs/providers/egg_timer_provider.dart';
+import 'package:boil_eggs/widgets/ad_banner.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
 
 class FinishScreen extends StatefulWidget {
@@ -32,6 +35,10 @@ class _FinishScreenState extends State<FinishScreen> {
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     return Scaffold(
+      bottomNavigationBar: const BannerAdWidget()
+          .animate()
+          .fadeIn(delay: 1000.ms, duration: 800.ms)
+          .slideY(begin: 0.2, end: 0, curve: Curves.easeOutQuad),
       body: Stack(
         children: [
           Align(
@@ -85,7 +92,9 @@ class _FinishScreenState extends State<FinishScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Pop back to home (TimerScreen was pushed replaced, so popping this goes to home)
+                        // Reset timer state so it's ready for next use
+                        context.read<EggTimerProvider>().reset();
+                        // Pop back to home
                         Navigator.of(context).pop(); 
                       },
                       child: Text(t.boilMore),

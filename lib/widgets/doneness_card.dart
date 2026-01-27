@@ -7,12 +7,14 @@ class DonenessCard extends StatelessWidget {
   final EggDoneness doneness;
   final bool isSelected;
   final VoidCallback onTap;
+  final String? displayTime; // Optional: Override displayed time
 
   const DonenessCard({
     super.key,
     required this.doneness,
     required this.isSelected,
     required this.onTap,
+    this.displayTime,
   });
 
   @override
@@ -92,10 +94,11 @@ class DonenessCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '${doneness.baseMinutes}',
+                  displayTime ?? '${doneness.baseMinutes}',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: color,
+                        fontSize: (displayTime != null && displayTime!.length > 2) ? 24 : null, // Adjust for "5:30"
                       ),
                 ),
                 Text(

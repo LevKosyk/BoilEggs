@@ -197,11 +197,11 @@ class _TimerScreenState extends State<TimerScreen> {
                             )
                           else if (provider.status == TimerStatus.paused || provider.status == TimerStatus.idle)
                              _ControlButton(
-                              icon: Icons.play_arrow_rounded,
-                              label: t.resume,
-                              color: AppColors.secondaryAccent,
-                              onTap: provider.startTimer,
-                            ),
+                               icon: Icons.play_arrow_rounded,
+                               label: t.resume,
+                               color: AppColors.secondaryAccent,
+                               onTap: provider.startTimer,
+                             ),
                             
                           const SizedBox(width: 24),
                           
@@ -220,37 +220,57 @@ class _TimerScreenState extends State<TimerScreen> {
 
                     
                     // Smart Tip
-                    if (provider.status == TimerStatus.boiling)
-                       Container(
-                         margin: const EdgeInsets.symmetric(horizontal: 24),
-                         padding: const EdgeInsets.all(16),
-                         decoration: BoxDecoration(
-                           color: Colors.white.withValues(alpha: 0.9),
-                           borderRadius: BorderRadius.circular(16),
-                           boxShadow: [
-                             BoxShadow(
-                               color: Colors.black.withValues(alpha: 0.05),
-                               blurRadius: 10,
-                               offset: const Offset(0, 4),
-                             ),
-                           ],
-                         ),
-                         child: Row(
-                           children: [
-                             const Icon(Icons.lightbulb_rounded, color: Colors.orangeAccent),
-                             const SizedBox(width: 12),
-                             Expanded(
-                               child: Text(
-                                 "Tip: ${_getSmartTip()}",
-                                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                   color: AppColors.textSecondary,
-                                   fontStyle: FontStyle.italic,
-                                 ),
+                    if (provider.status == TimerStatus.boiling) ...[
+                       Builder(
+                         builder: (context) {
+                           final tips = _getTips(t);
+                           // Ensure index is valid just in case
+                           final tip = tips[_currentTipIndex % tips.length];
+                           
+                           return InkWell(
+                             onTap: _nextTip,
+                             borderRadius: BorderRadius.circular(16),
+                             child: Container(
+                               margin: const EdgeInsets.symmetric(horizontal: 24),
+                               padding: const EdgeInsets.all(16),
+                               decoration: BoxDecoration(
+                                 color: Colors.white.withValues(alpha: 0.9),
+                                 borderRadius: BorderRadius.circular(16),
+                                 boxShadow: [
+                                   BoxShadow(
+                                     color: Colors.black.withValues(alpha: 0.05),
+                                     blurRadius: 10,
+                                     offset: const Offset(0, 4),
+                                   ),
+                                 ],
+                               ),
+                               child: Row(
+                                 children: [
+                                   Icon(Icons.lightbulb_rounded, color: Colors.orangeAccent)
+                                      .animate(key: ValueKey(_currentTipIndex))
+                                      .rotate(duration: 400.ms, curve: Curves.easeOutBack) // Spin
+                                      .scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), duration: 400.ms), // Pop
+                                   const SizedBox(width: 12),
+                                   Expanded(
+                                      child: Text(
+                                        "Tip: $tip",
+                                        key: ValueKey(_currentTipIndex),
+                                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                          color: AppColors.textSecondary,
+                                          fontStyle: FontStyle.italic,
+                                        ),
+                                      ).animate(key: ValueKey(_currentTipIndex)) // Trigger on change
+                                       .fadeIn(duration: 300.ms)
+                                       .slideX(begin: 0.2, end: 0, curve: Curves.easeOut), // Slide in from right
+                                   ),
+                                   const Icon(Icons.touch_app_rounded, size: 16, color: AppColors.textSecondary),
+                                 ],
                                ),
                              ),
-                           ],
-                         ),
-                       ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 1000.ms),
+                           ).animate().fadeIn().slideY(begin: 0.2, end: 0, delay: 1000.ms);
+                         }
+                       ),
+                    ],
 
                     const SizedBox(height: 20),
                   ],
@@ -263,16 +283,28 @@ class _TimerScreenState extends State<TimerScreen> {
     );
   }
 
-  String _getSmartTip() {
-    const tips = [
-      "Use older eggs for easier peeling.",
-      "Shock eggs in ice water after boiling to stop cooking.",
-      "Add a pinch of salt to the water to prevent cracking.",
-      "Room temperature eggs are less likely to crack.",
-      "Don't overcrowd the pot; eggs should fit in a single layer.",
+  int _currentTipIndex = 0;
+
+  List<String> _getTips(AppLocalizations t) {
+    return [
+      t.tip1, t.tip2, t.tip3, t.tip4, t.tip5, t.tip6, t.tip7, t.tip8, t.tip9, t.tip10,
+      t.tip11, t.tip12, t.tip13, t.tip14, t.tip15, t.tip16, t.tip17, t.tip18, t.tip19, t.tip20,
+      t.tip21, t.tip22, t.tip23, t.tip24, t.tip25, t.tip26, t.tip27, t.tip28, t.tip29, t.tip30,
+      t.tip31, t.tip32, t.tip33, t.tip34, t.tip35, t.tip36, t.tip37, t.tip38, t.tip39, t.tip40,
+      t.tip41, t.tip42, t.tip43, t.tip44, t.tip45, t.tip46, t.tip47, t.tip48, t.tip49, t.tip50,
+      t.tip51, t.tip52, t.tip53, t.tip54, t.tip55, t.tip56, t.tip57, t.tip58, t.tip59, t.tip60,
+      t.tip61, t.tip62, t.tip63, t.tip64, t.tip65, t.tip66, t.tip67, t.tip68, t.tip69, t.tip70,
+      t.tip71, t.tip72, t.tip73, t.tip74, t.tip75, t.tip76, t.tip77, t.tip78, t.tip79, t.tip80,
+      t.tip81, t.tip82, t.tip83, t.tip84, t.tip85, t.tip86, t.tip87, t.tip88, t.tip89, t.tip90,
+      t.tip91, t.tip92, t.tip93, t.tip94, t.tip95, t.tip96, t.tip97, t.tip98, t.tip99, t.tip100,
+      t.tip101, t.tip102, t.tip103, t.tip104, t.tip105, t.tip106, t.tip107,
     ];
-    // Simple rotation based on current minute or random
-    return tips[DateTime.now().minute % tips.length];
+  }
+
+  void _nextTip() {
+    setState(() {
+      _currentTipIndex++;
+    });
   }
 }
 
