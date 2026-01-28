@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-
 class SettingsSection extends StatelessWidget {
   final String title;
   final List<Widget> children;
-
   const SettingsSection({
     super.key,
     required this.title,
     required this.children,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -30,7 +27,7 @@ class SettingsSection extends StatelessWidget {
         Container(
           width: double.infinity,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.8), // Semi-transparent for Gradient
+            color: Colors.white.withValues(alpha: 0.8),  
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
@@ -48,13 +45,11 @@ class SettingsSection extends StatelessWidget {
     );
   }
 }
-
 class SettingsTile extends StatelessWidget {
   final String title;
   final Widget? trailing;
   final VoidCallback? onTap;
   final bool showDivider;
-
   const SettingsTile({
     super.key,
     required this.title,
@@ -62,7 +57,6 @@ class SettingsTile extends StatelessWidget {
     this.onTap,
     this.showDivider = true,
   });
-
   @override
   Widget build(BuildContext context) {
     return InkWell(

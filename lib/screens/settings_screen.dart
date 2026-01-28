@@ -3,21 +3,18 @@ import 'package:provider/provider.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
 import 'package:boil_eggs/widgets/settings_widgets.dart';
 import 'package:boil_eggs/services/history_service.dart';
-import 'package:boil_eggs/providers/egg_timer_provider.dart'; // Add import
+import 'package:boil_eggs/providers/egg_timer_provider.dart';  
 import 'package:boil_eggs/theme/app_colors.dart';
 import '../providers/locale_provider.dart';
-
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
-
   @override
   @override
   @override
   Widget build(BuildContext context) {
     var localeProvider = Provider.of<LocaleProvider>(context);
-    var timerProvider = Provider.of<EggTimerProvider>(context); // Listen to timer provider
+    var timerProvider = Provider.of<EggTimerProvider>(context);  
     var t = AppLocalizations.of(context)!;
-
     return Scaffold(
       extendBodyBehindAppBar: true, 
       appBar: AppBar(
@@ -70,7 +67,6 @@ class SettingsScreen extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 24),
-              // Statistics Section
               FutureBuilder<List<int>>(
                 future: Future.wait([
                   HistoryService().getBoilsToday(),
@@ -79,7 +75,6 @@ class SettingsScreen extends StatelessWidget {
                 builder: (context, snapshot) {
                   final today = snapshot.data?[0] ?? 0;
                   final week = snapshot.data?[1] ?? 0;
-                  
                   return SettingsSection(
                     title: "STATISTICS",
                     children: [
@@ -103,7 +98,6 @@ class SettingsScreen extends StatelessWidget {
                 }
               ),
               const SizedBox(height: 24),
-              // Sound & Haptics Section
               SettingsSection(
                 title: "SOUND & HAPTICS",
                 children: [
@@ -239,7 +233,6 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
-
   String _getLanguageName(String? code) {
     if (code == null) return "System Default";
     return switch (code) {
@@ -253,20 +246,17 @@ class SettingsScreen extends StatelessWidget {
     };
   }
 }
-
 class _LanguageOption extends StatelessWidget {
   final String label;
   final String? code;
   final bool isSelected;
   final VoidCallback onTap;
-
   const _LanguageOption({
     required this.label,
     required this.code,
     required this.isSelected,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return InkWell(

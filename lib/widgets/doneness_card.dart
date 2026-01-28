@@ -2,13 +2,11 @@ import 'package:boil_eggs/providers/egg_timer_provider.dart';
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
-
 class DonenessCard extends StatelessWidget {
   final EggDoneness doneness;
   final bool isSelected;
   final VoidCallback onTap;
-  final String? displayTime; // Optional: Override displayed time
-
+  final String? displayTime;  
   const DonenessCard({
     super.key,
     required this.doneness,
@@ -16,7 +14,6 @@ class DonenessCard extends StatelessWidget {
     required this.onTap,
     this.displayTime,
   });
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -25,15 +22,12 @@ class DonenessCard extends StatelessWidget {
       EggDoneness.medium => AppColors.mediumEgg,
       EggDoneness.hard => AppColors.hardEgg,
     };
-
     final label = switch (doneness) {
       EggDoneness.soft => t.soft,
       EggDoneness.medium => t.medium,
       EggDoneness.hard => t.hard,
     };
-
     final scale = isSelected ? 1.05 : 1.0;
-
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -59,7 +53,6 @@ class DonenessCard extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // Mini Egg Icon
             Container(
               width: 48,
               height: 60,
@@ -81,12 +74,6 @@ class DonenessCard extends StatelessWidget {
                         ),
                   ),
                   const SizedBox(height: 4),
-                  // Text(
-                  //   doneness.description, // TODO: Localize description
-                  //   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  //         color: AppColors.textSecondary,
-                  //       ),
-                  // ),
                 ],
               ),
             ),
@@ -98,7 +85,7 @@ class DonenessCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: color,
-                        fontSize: (displayTime != null && displayTime!.length > 2) ? 24 : null, // Adjust for "5:30"
+                        fontSize: (displayTime != null && displayTime!.length > 2) ? 24 : null,  
                       ),
                 ),
                 Text(

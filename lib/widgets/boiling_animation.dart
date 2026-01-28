@@ -1,10 +1,8 @@
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 class BoilingAnimation extends StatelessWidget {
   const BoilingAnimation({super.key});
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -13,7 +11,6 @@ class BoilingAnimation extends StatelessWidget {
       child: Stack(
         alignment: Alignment.bottomCenter,
         children: [
-          // Generate multiple bubbles
           for (int i = 0; i < 15; i++)
             Positioned(
               left: (i * 25.0) % 300,
@@ -25,12 +22,9 @@ class BoilingAnimation extends StatelessWidget {
     );
   }
 }
-
 class _Bubble extends StatelessWidget {
   final int delay;
-
   const _Bubble({required this.delay});
-
   @override
   Widget build(BuildContext context) {
     return Container(

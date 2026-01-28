@@ -1,16 +1,13 @@
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:flutter/material.dart';
-
 class CircularTimer extends StatelessWidget {
-  final double progress; // 0.0 to 1.0
+  final double progress;  
   final String timeText;
-
   const CircularTimer({
     super.key,
     required this.progress,
     required this.timeText,
   });
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
@@ -19,7 +16,6 @@ class CircularTimer extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          // Background Circle
           SizedBox(
             width: 250,
             height: 250,
@@ -29,7 +25,6 @@ class CircularTimer extends StatelessWidget {
               color: AppColors.softEgg.withValues(alpha: 0.3),
             ),
           ),
-          // Progress Circle
           SizedBox(
             width: 250,
             height: 250,
@@ -40,7 +35,6 @@ class CircularTimer extends StatelessWidget {
               color: AppColors.primaryAccent,
             ),
           ),
-          // Timer Text
           Column(
             mainAxisSize: MainAxisSize.min,
             children: [

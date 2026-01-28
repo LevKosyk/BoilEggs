@@ -3,34 +3,27 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:boil_eggs/providers/egg_timer_provider.dart';
 import 'package:boil_eggs/widgets/ad_banner.dart';
 import 'package:boil_eggs/l10n/app_localizations.dart';
-
 class FinishScreen extends StatefulWidget {
   const FinishScreen({super.key});
-
   @override
   State<FinishScreen> createState() => _FinishScreenState();
 }
-
 class _FinishScreenState extends State<FinishScreen> {
   late ConfettiController _confettiController;
-
   @override
   void initState() {
     super.initState();
     _confettiController = ConfettiController(duration: const Duration(seconds: 3));
     _confettiController.play();
   }
-
   @override
   void dispose() {
     _confettiController.dispose();
     super.dispose();
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
@@ -67,9 +60,7 @@ class _FinishScreenState extends State<FinishScreen> {
                     color: AppColors.secondaryAccent,
                   ).animate(onPlay: (c) => c.repeat(reverse: true))
                    .scale(begin: const Offset(1, 1), end: const Offset(1.1, 1.1), duration: 1000.ms),
-                  
                   const SizedBox(height: 32),
-                  
                   Text(
                     t.successTitle,
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -85,16 +76,12 @@ class _FinishScreenState extends State<FinishScreen> {
                           color: AppColors.textSecondary,
                         ),
                   ),
-
                   const SizedBox(height: 48),
-
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
-                        // Reset timer state so it's ready for next use
                         context.read<EggTimerProvider>().reset();
-                        // Pop back to home
                         Navigator.of(context).pop(); 
                       },
                       child: Text(t.boilMore),

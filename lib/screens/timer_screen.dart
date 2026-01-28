@@ -1,40 +1,33 @@
 import 'package:boil_eggs/providers/egg_timer_provider.dart';
-import 'package:boil_eggs/screens/finish_screen.dart'; // We'll create this next
+import 'package:boil_eggs/screens/finish_screen.dart';  
 import 'package:boil_eggs/theme/app_colors.dart';
 import 'package:boil_eggs/widgets/boiling_animation.dart';
 import 'package:boil_eggs/widgets/egg_illustration.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
 import 'package:boil_eggs/l10n/app_localizations.dart';
-
 class TimerScreen extends StatefulWidget {
   const TimerScreen({super.key});
-
   @override
   State<TimerScreen> createState() => _TimerScreenState();
 }
-
 class _TimerScreenState extends State<TimerScreen> {
   @override
   void initState() {
     super.initState();
-    // Auto-start timer after a short delay for smooth transition
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted) {
         context.read<EggTimerProvider>().startTimer();
       }
     });
   }
-
   @override
   Widget build(BuildContext context) {
     final t = AppLocalizations.of(context)!;
     return Scaffold(
       body: Consumer<EggTimerProvider>(
         builder: (context, provider, child) {
-          // Listen for completion to navigate
           if (provider.status == TimerStatus.done) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               Navigator.of(context).pushReplacement(
@@ -42,11 +35,9 @@ class _TimerScreenState extends State<TimerScreen> {
               );
             });
           }
-
           final minutes = (provider.remainingSeconds / 60).floor();
           final seconds = provider.remainingSeconds % 60;
           final timeText = '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
-          
           String titleStr = t.defaultTitle;
           if (provider.selectedDoneness != null) {
              titleStr = switch (provider.selectedDoneness!) {
@@ -55,19 +46,15 @@ class _TimerScreenState extends State<TimerScreen> {
                 EggDoneness.hard => t.hard,
              };
           }
-
           return Stack(
             children: [
-              // Boiling Animation Background (activates when boiling)
               if (provider.status == TimerStatus.boiling)
                  const Positioned.fill(
                    child: BoilingAnimation(),
                  ),
-
               SafeArea(
                 child: Column(
                   children: [
-                    // Top Bar
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       child: Row(
@@ -87,18 +74,14 @@ class _TimerScreenState extends State<TimerScreen> {
                                 ),
                           ),
                           const Spacer(),
-                          const SizedBox(width: 48), // Balance for back button
+                          const SizedBox(width: 48),  
                         ],
                       ),
                     ),
-                    
                     const Spacer(),
-
-                    // Timer & Egg Visual
                     Stack(
                       alignment: Alignment.center,
                       children: [
-                        // Background Circle
                         SizedBox(
                           width: 250,
                           height: 250,
@@ -108,7 +91,6 @@ class _TimerScreenState extends State<TimerScreen> {
                             color: AppColors.softEgg.withValues(alpha: 0.2),
                           ),
                         ),
-                        // Progress Circle
                         SizedBox(
                           width: 250,
                           height: 250,
@@ -119,20 +101,16 @@ class _TimerScreenState extends State<TimerScreen> {
                             color: AppColors.primaryAccent,
                           ),
                         ),
-                        // The Egg
                         const EggIllustration(height: 140)
                             .animate(
                               target: provider.status == TimerStatus.boiling ? 1 : 0,
                               onPlay: (controller) => controller.repeat(reverse: true),
                             )
-                            .moveY(begin: 0, end: -10, duration: 1000.ms, curve: Curves.easeInOut) // Bobbing effect
-                            .shake(hz: 0.5, rotation: 0.05), // Slight wobble
+                            .moveY(begin: 0, end: -10, duration: 1000.ms, curve: Curves.easeInOut)  
+                            .shake(hz: 0.5, rotation: 0.05),  
                       ],
                     ).animate().scale(curve: Curves.easeOutBack, duration: 500.ms),
-
                     const SizedBox(height: 40),
-                    
-                    // Time Text
                     Column(
                       children: [
                         Text(
@@ -152,10 +130,7 @@ class _TimerScreenState extends State<TimerScreen> {
                         ),
                       ],
                     ),
-                    
                     const SizedBox(height: 24),
-
-                    // Upgrade Button
                     if (provider.selectedDoneness != null && provider.selectedDoneness != EggDoneness.hard)
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
@@ -179,10 +154,7 @@ class _TimerScreenState extends State<TimerScreen> {
                             ),
                           ).animate().fadeIn().slideY(begin: 0.2, end: 0),
                         ),
-
                     const Spacer(),
-
-                    // Controls
                     Padding(
                       padding: const EdgeInsets.all(32.0),
                       child: Row(
@@ -202,9 +174,7 @@ class _TimerScreenState extends State<TimerScreen> {
                                color: AppColors.secondaryAccent,
                                onTap: provider.startTimer,
                              ),
-                            
                           const SizedBox(width: 24),
-                          
                           _ControlButton(
                             icon: Icons.stop_rounded,
                             label: t.cancel,
@@ -217,16 +187,11 @@ class _TimerScreenState extends State<TimerScreen> {
                         ],
                       ),
                     ),
-
-                    
-                    // Smart Tip
                     if (provider.status == TimerStatus.boiling) ...[
                        Builder(
                          builder: (context) {
                            final tips = _getTips(t);
-                           // Ensure index is valid just in case
                            final tip = tips[_currentTipIndex % tips.length];
-                           
                            return InkWell(
                              onTap: _nextTip,
                              borderRadius: BorderRadius.circular(16),
@@ -248,8 +213,8 @@ class _TimerScreenState extends State<TimerScreen> {
                                  children: [
                                    Icon(Icons.lightbulb_rounded, color: Colors.orangeAccent)
                                       .animate(key: ValueKey(_currentTipIndex))
-                                      .rotate(duration: 400.ms, curve: Curves.easeOutBack) // Spin
-                                      .scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), duration: 400.ms), // Pop
+                                      .rotate(duration: 400.ms, curve: Curves.easeOutBack)  
+                                      .scale(begin: const Offset(0.5, 0.5), end: const Offset(1, 1), duration: 400.ms),  
                                    const SizedBox(width: 12),
                                    Expanded(
                                       child: Text(
@@ -259,9 +224,9 @@ class _TimerScreenState extends State<TimerScreen> {
                                           color: AppColors.textSecondary,
                                           fontStyle: FontStyle.italic,
                                         ),
-                                      ).animate(key: ValueKey(_currentTipIndex)) // Trigger on change
+                                      ).animate(key: ValueKey(_currentTipIndex))  
                                        .fadeIn(duration: 300.ms)
-                                       .slideX(begin: 0.2, end: 0, curve: Curves.easeOut), // Slide in from right
+                                       .slideX(begin: 0.2, end: 0, curve: Curves.easeOut),  
                                    ),
                                    const Icon(Icons.touch_app_rounded, size: 16, color: AppColors.textSecondary),
                                  ],
@@ -271,7 +236,6 @@ class _TimerScreenState extends State<TimerScreen> {
                          }
                        ),
                     ],
-
                     const SizedBox(height: 20),
                   ],
                 ),
@@ -282,9 +246,7 @@ class _TimerScreenState extends State<TimerScreen> {
       ),
     );
   }
-
   int _currentTipIndex = 0;
-
   List<String> _getTips(AppLocalizations t) {
     return [
       t.tip1, t.tip2, t.tip3, t.tip4, t.tip5, t.tip6, t.tip7, t.tip8, t.tip9, t.tip10,
@@ -300,27 +262,23 @@ class _TimerScreenState extends State<TimerScreen> {
       t.tip101, t.tip102, t.tip103, t.tip104, t.tip105, t.tip106, t.tip107,
     ];
   }
-
   void _nextTip() {
     setState(() {
       _currentTipIndex++;
     });
   }
 }
-
 class _ControlButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
   final VoidCallback onTap;
-
   const _ControlButton({
     required this.icon,
     required this.label,
     required this.color,
     required this.onTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return Column(
