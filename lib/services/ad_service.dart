@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:boil_eggs/lib/env/env.dart';
+import 'package:boil_eggs/env/env.dart';
 class AdService {
   static final AdService _instance = AdService._internal();
   factory AdService() => _instance;
