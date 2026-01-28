@@ -54,6 +54,7 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+      extendBodyBehindAppBar: true,
       bottomNavigationBar: const BannerAdWidget(), // Ad Banner fixed at bottom
       body: Container(
         decoration: BoxDecoration(
@@ -66,9 +67,7 @@ class HomeScreen extends StatelessWidget {
             ],
           ),
         ),
-        child: SafeArea(
-        child: SafeArea(
-          child: LayoutBuilder(
+        child: LayoutBuilder(
             builder: (context, constraints) {
               return SingleChildScrollView(
                 child: ConstrainedBox(
@@ -76,6 +75,7 @@ class HomeScreen extends StatelessWidget {
                   child: IntrinsicHeight(
                     child: Column(
                       children: [
+                        SizedBox(height: MediaQuery.of(context).padding.top),
                         const Spacer(),
                         // Title
                         Text(
@@ -201,9 +201,7 @@ class HomeScreen extends StatelessWidget {
             }
           ),
         ),
-        ),
-      ),
-    );
+      );
   }
 }
 
